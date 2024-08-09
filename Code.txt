@@ -1,0 +1,193 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+
+class Program
+{
+    static void ValidateInput(string input, int maxLength, string fieldName)
+    {
+        if (input.Length > maxLength)
+        {
+            throw new ArgumentException($"{fieldName} exceeds the maximum length of {maxLength} characters.");
+        }
+    }
+
+    static string FormatField(string input, int maxLength, char replacementChar, string direction)
+    {
+        if (direction.ToLower() == "left")
+        {
+            return input.PadLeft(maxLength, replacementChar).Substring(0, maxLength);
+        }
+        else
+        {
+            return input.PadRight(maxLength, replacementChar).Substring(0, maxLength);
+        }
+    }
+
+    static string FormatText(XElement config, string name, string email, string age, string address, string obs, string money)
+    {
+        // Extract header and info configurations from XML
+        var headerConfig = config.Element("Header").Elements("Column").ToList();
+        var infoConfig = config.Element("Info").Elements("Field").ToList();
+
+        // Format the header using the header configuration
+        string headerLine = string.Join("", headerConfig.Select(column =>
+            FormatField(column.Attribute("Name").Value,
+                        int.Parse(column.Attribute("MaxLength").Value),
+                        column.Attribute("ReplacementChar").Value[0],
+                        column.Attribute("Direction").Value)
+        )) + "\n";
+
+        // Format the information fields using the info configuration
+        string nameFormatted = FormatField(name,
+                                           int.Parse(infoConfig.First(e => e.Attribute("Name").Value == "Name").Attribute("MaxLength").Value),
+                                           infoConfig.First(e => e.Attribute("Name").Value == "Name").Attribute("ReplacementChar").Value[0],
+                                           infoConfig.First(e => e.Attribute("Name").Value == "Name").Attribute("Direction").Value);
+
+        string emailFormatted = FormatField(email,
+                                            int.Parse(infoConfig.First(e => e.Attribute("Name").Value == "Email").Attribute("MaxLength").Value),
+                                            infoConfig.First(e => e.Attribute("Name").Value == "Email").Attribute("ReplacementChar").Value[0],
+                                            infoConfig.First(e => e.Attribute("Name").Value == "Email").Attribute("Direction").Value);
+
+        string ageFormatted = FormatField(age,
+                                          int.Parse(infoConfig.First(e => e.Attribute("Name").Value == "Age").Attribute("MaxLength").Value),
+                                          infoConfig.First(e => e.Attribute("Name").Value == "Age").Attribute("ReplacementChar").Value[0],
+                                          infoConfig.First(e => e.Attribute("Name").Value == "Age").Attribute("Direction").Value);
+
+        string addressFormatted = FormatField(address,
+                                              int.Parse(infoConfig.First(e => e.Attribute("Name").Value == "Address").Attribute("MaxLength").Value),
+                                              infoConfig.First(e => e.Attribute("Name").Value == "Address").Attribute("ReplacementChar").Value[0],
+                                              infoConfig.First(e => e.Attribute("Name").Value == "Address").Attribute("Direction").Value);
+
+        string obsFormatted = FormatField(obs,
+                                          int.Parse(infoConfig.First(e => e.Attribute("Name").Value == "Observation").Attribute("MaxLength").Value),
+                                          infoConfig.First(e => e.Attribute("Name").Value == "Observation").Attribute("ReplacementChar").Value[0],
+                                          infoConfig.First(e => e.Attribute("Name").Value == "Observation").Attribute("Direction").Value);
+
+        string moneyFormatted = FormatField(money,
+                                            int.Parse(infoConfig.First(e => e.Attribute("Name").Value == "Money").Attribute("MaxLength").Value),
+                                            infoConfig.First(e => e.Attribute("Name").Value == "Money").Attribute("ReplacementChar").Value[0],
+                                            infoConfig.First(e => e.Attribute("Name").Value == "Money").Attribute("Direction").Value);
+
+        // Concatenate all the formatted parts into a single line
+        string infoLine = $"{nameFormatted}{emailFormatted}{ageFormatted}{addressFormatted}{obsFormatted}{moneyFormatted}\n";
+
+        return $"{headerLine}{infoLine}";
+    }
+
+    static void GenerateTextFile(XElement config, string name, string email, string age, string address, string obs, string money, string filePath)
+    {
+        string content = FormatText(config, name, email, age, address, obs, money);
+
+        // Writing the header and info lines twice with a newline after each pair
+        using (StreamWriter writer = new StreamWriter(filePath))
+        {
+            writer.Write(content); // First header and info
+            writer.Write(content); // Second header and info
+        }
+    }
+
+    static void GenerateXmlConfig(string xmlFilePath)
+    {
+        XElement config = new XElement("Configuration",
+            new XElement("Header",
+                new XElement("Column",
+                    new XAttribute("Name", "Name"),
+                    new XAttribute("MaxLength", 10),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Column",
+                    new XAttribute("Name", "Email"),
+                    new XAttribute("MaxLength", 20),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Column",
+                    new XAttribute("Name", "Age"),
+                    new XAttribute("MaxLength", 5),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Column",
+                    new XAttribute("Name", "Address"),
+                    new XAttribute("MaxLength", 30),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Column",
+                    new XAttribute("Name", "Observation"),
+                    new XAttribute("MaxLength", 50),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Column",
+                    new XAttribute("Name", "Money"),
+                    new XAttribute("MaxLength", 15),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right"))
+            ),
+            new XElement("Info",
+                new XElement("Field",
+                    new XAttribute("Name", "Name"),
+                    new XAttribute("MaxLength", 10),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Field",
+                    new XAttribute("Name", "Email"),
+                    new XAttribute("MaxLength", 20),
+                    new XAttribute("ReplacementChar", "x"),
+                    new XAttribute("Direction", "right")),
+                new XElement("Field",
+                    new XAttribute("Name", "Age"),
+                    new XAttribute("MaxLength", 5),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Field",
+                    new XAttribute("Name", "Address"),
+                    new XAttribute("MaxLength", 30),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Field",
+                    new XAttribute("Name", "Observation"),
+                    new XAttribute("MaxLength", 50),
+                    new XAttribute("ReplacementChar", " "),
+                    new XAttribute("Direction", "right")),
+                new XElement("Field",
+                    new XAttribute("Name", "Money"),
+                    new XAttribute("MaxLength", 15),
+                    new XAttribute("ReplacementChar", "0"),
+                    new XAttribute("Direction", "left"))
+            )
+        );
+
+        config.Save(xmlFilePath);
+    }
+
+    static void Main()
+    {
+        try
+        {
+            // Generate the XML configuration file
+            string xmlFilePath = "C:\\teste\\config.xml";
+            GenerateXmlConfig(xmlFilePath);
+
+            // Load the XML configuration
+            XElement config = XElement.Load(xmlFilePath);
+
+            // Sample data
+            string name = "John";
+            string email = "john@example.com";
+            string age = "35";
+            string address = "123 St, City";
+            string obs = "This is an observation.";
+            string money = "500";
+
+            string filePath = "C:\\teste\\output.txt";
+            GenerateTextFile(config, name, email, age, address, obs, money, filePath);
+
+            Console.WriteLine("File and XML configuration generated successfully!");
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}
+

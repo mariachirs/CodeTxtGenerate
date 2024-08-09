@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <Header>
+    <Column Name="Name" MaxLength="10" ReplacementChar=" " Direction="right" />
+    <Column Name="Email" MaxLength="20" ReplacementChar=" " Direction="right" />
+    <Column Name="Age" MaxLength="5" ReplacementChar=" " Direction="right" />
+    <Column Name="Address" MaxLength="30" ReplacementChar=" " Direction="right" />
+    <Column Name="Observation" MaxLength="50" ReplacementChar=" " Direction="right" />
+    <Column Name="Money" MaxLength="15" ReplacementChar=" " Direction="right" />
+  </Header>
+  <Info>
+    <Field Name="Name" MaxLength="10" ReplacementChar=" " Direction="right" />
+    <Field Name="Email" MaxLength="20" ReplacementChar="x" Direction="right" />
+    <Field Name="Age" MaxLength="5" ReplacementChar=" " Direction="right" />
+    <Field Name="Address" MaxLength="30" ReplacementChar=" " Direction="right" />
+    <Field Name="Observation" MaxLength="50" ReplacementChar=" " Direction="right" />
+    <Field Name="Money" MaxLength="15" ReplacementChar="0" Direction="left" />
+  </Info>
+</Configuration>

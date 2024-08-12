@@ -1,19 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Configuration>
-  <Header>
-    <Column Name="Name" MaxLength="10" ReplacementChar=" " Direction="right" />
-    <Column Name="Email" MaxLength="20" ReplacementChar=" " Direction="right" />
-    <Column Name="Age" MaxLength="5" ReplacementChar=" " Direction="right" />
-    <Column Name="Address" MaxLength="30" ReplacementChar=" " Direction="right" />
-    <Column Name="Observation" MaxLength="50" ReplacementChar=" " Direction="right" />
-    <Column Name="Money" MaxLength="15" ReplacementChar=" " Direction="right" />
-  </Header>
-  <Info>
-    <Field Name="Name" MaxLength="10" ReplacementChar=" " Direction="right" />
-    <Field Name="Email" MaxLength="20" ReplacementChar="x" Direction="right" />
-    <Field Name="Age" MaxLength="5" ReplacementChar=" " Direction="right" />
-    <Field Name="Address" MaxLength="30" ReplacementChar=" " Direction="right" />
-    <Field Name="Observation" MaxLength="50" ReplacementChar=" " Direction="right" />
-    <Field Name="Money" MaxLength="15" ReplacementChar="0" Direction="left" />
-  </Info>
-</Configuration>
+﻿<FormattingRules>
+    <Header>
+        <Field name="Name" maxLength="50" paddingChar=" " align="Right" />
+        <Field name="Email" maxLength="40" paddingChar="x" align="Right" />
+        <Field name="Age" maxLength="10" paddingChar=" " align="Right" />
+        <Field name="Address" maxLength="100" paddingChar=" " align="Right" />
+        <Field name="Obs" maxLength="1000" paddingChar=" " align="Right" />
+        <Field name="MoneyAvailable" maxLength="15" paddingChar="0" align="Left" />
+    </Header>
+    <Information>
+        <Field name="Name" maxLength="50" paddingChar=" " align="Right" />
+        <Field name="Email" maxLength="40" paddingChar="x" align="Right" />
+        <Field name="Age" maxLength="10" paddingChar=" " align="Right" />
+        <Field name="Address" maxLength="100" paddingChar=" " align="Right" />
+        <Field name="Obs" maxLength="1000" paddingChar=" " align="Right" />
+        <Field name="MoneyAvailable" maxLength="15" paddingChar="0" align="Left" />
+    </Information>
+</FormattingRules>

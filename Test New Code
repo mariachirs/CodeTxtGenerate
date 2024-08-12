@@ -1,0 +1,40 @@
+using NUnit.Framework;
+using System.IO;
+
+[TestFixture]
+public class TextFileGeneratorTests
+{
+    private const string ConfigFilePath = "FormattingRules.xml";
+    private const string OutputFilePath = "output.txt";
+
+    [SetUp]
+    public void SetUp()
+    {
+        // Ensure the output file is clean before each test
+        if (File.Exists(OutputFilePath))
+        {
+            File.Delete(OutputFilePath);
+        }
+    }
+
+    [Test]
+    public void GenerateTextFile_CreatesFileWithCorrectContent()
+    {
+        // Act
+        TextFileGenerator.GenerateTextFile(ConfigFilePath, OutputFilePath);
+
+        // Assert
+        Assert.IsTrue(File.Exists(OutputFilePath), "Output file was not created.");
+
+        var lines = File.ReadAllLines(OutputFilePath);
+        Assert.AreEqual(10, lines.Length, "The output file should contain 10 lines (5 headers + 5 information).");
+
+        for (int i = 0; i < 10; i += 2)
+        {
+            Assert.IsTrue(lines[i].StartsWith("HeaderName"), $"Line {i + 1} should be a header line.");
+            Assert.IsTrue(lines[i + 1].StartsWith("InfoName"), $"Line {i + 2} should be an information line.");
+            Assert.AreEqual(1205, lines[i].Length, $"Line {i + 1} should be 1205 characters long.");
+            Assert.AreEqual(1205, lines[i + 1].Length, $"Line {i + 2} should be 1205 characters long.");
+        }
+    }
+}

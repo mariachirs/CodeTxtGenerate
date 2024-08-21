@@ -1,0 +1,24 @@
+ public static void SetPropertyValue<T>(T obj, string propertyName, string value)
+    {
+        PropertyInfo propertyInfo = typeof(T).GetProperty(propertyName);
+
+        if (propertyInfo != null && propertyInfo.CanWrite)
+        {
+            if (propertyInfo.PropertyType == typeof(string))
+            {
+                propertyInfo.SetValue(obj, value, null);
+            }
+            else if (propertyInfo.PropertyType == typeof(int) && int.TryParse(value, out int intValue))
+            {
+                propertyInfo.SetValue(obj, intValue, null);
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid value for property '{propertyName}' on type '{typeof(T).Name}'");
+            }
+        }
+        else
+        {
+            throw new ArgumentException($"Property '{propertyName}' not found or not writable on type '{typeof(T).Name}'");
+        }
+    }

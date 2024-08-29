@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspect jQuery Events</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+    <button id="triggerAjax">Trigger AJAX Request</button>
+
+    <script>
+        $(document).ready(function() {
+            // Attach ajaxStart listener
+            $(document).ajaxStart(function() {
+                console.log("ajaxStart listener is active and triggered.");
+            });
+
+            // Simulate an AJAX request when the button is clicked
+            $("#triggerAjax").on("click", function() {
+                $.ajax({
+                    url: "https://jsonplaceholder.typicode.com/posts",
+                    method: "GET",
+                    success: function(data) {
+                        console.log("AJAX request successful");
+						alert("AJAX request successful");
+                    }
+                });
+            });
+
+            // Inspect the event data to check if ajaxStart listener is attached
+            console.log("Inspecting jQuery event data for ajaxStart listener:");
+			console.log($._data($(document)[0], "events"));
+        });
+    </script>
+</body>
+</html>

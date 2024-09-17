@@ -1,0 +1,179 @@
+$(function () {
+    const virtualDirectory = sessionStorage.getItem("VirtualDirectory");
+
+    if ($('#criteres-gestion-versements').length > 0) {
+        InitDefaultValues();
+    }
+
+    $('#modifier-declaration-id #btnAnnulerDeclaration').click(() => {
+        location.href = demandeUrl;
+    })
+
+    $('#criteres-gestion-versements #btnRenitialiserCriters').click(() => {
+
+        if ($('#criteres-gestion-versements #champUtdAnneeFinanciere').attr('invalide') === 'true') {
+            $('#criteres-gestion-versements #champUtdAnneeFinanciere').attr('invalide', false);
+        }
+        if ($('#criteres-gestion-versements #champUtdStatut').attr('invalide') === 'true') {
+            $('#criteres-gestion-versements #champUtdStatut').attr('invalide', false);
+        }
+
+        $("#versements-a-gerer").addClass('visually-hidden');
+        $("#btnConfirmerValidation").addClass('visually-hidden');
+
+        grid = $('#dtVersementsAGerer').DataTable();
+        grid.search('').draw();
+        grid.columns().search('').draw();
+        grid.page('first').draw('page');
+
+        InitDefaultValues();
+
+    });
+
+    $('#criteres-gestion-versements #statut-id').on('change', function () {
+
+        if ($('#criteres-gestion-versements #statut-id').val() !== "" && $('#criteres-gestion-versements #champUtdStatut').attr('invalide') === 'true') {
+            $('#criteres-gestion-versements #champUtdStatut').attr('invalide', false);
+        }
+
+        UnckedErrorWithControl($('#criteres-gestion-versements #champUtdStatut'));
+
+    })
+
+    $('#criteres-gestion-versements #annee-financiere-id').on('change', function () {
+
+        if ($('#criteres-gestion-versements #annee-financiere-id').val() !== "" && $('#criteres-gestion-versements #champUtdAnneeFinanciere').attr('invalide') === 'true') {
+            $('#criteres-gestion-versements #champUtdAnneeFinanciere').attr('invalide', false);
+        }
+
+        UnckedErrorWithControl($('#criteres-gestion-versements #champUtdAnneeFinanciere'));
+    })
+
+    function UnckedErrorWithControl(control) {
+        if (control.attr('invalide') === 'false') {
+            id = control.closest('utd-champ-form').attr('id');
+            control.closest('utd-champ-form').attr('invalide', false);
+            $('.utd-avis-gestion-versement-filtre li').has('a[href="#' + id + '"]').remove();
+
+            if ($('.utd-avis-gestion-versement-filtre li').length === 0) {
+                $('.utd-avis-gestion-versement-filtre').html('');
+                $('.utd-avis-gestion-versement-filtre').attr('style', 'display:none;');
+            }
+        }
+    }
+
+    $('#criteres-gestion-versements #btnRechercher').click(function () {
+
+        const button = this;
+        const versementStatut = $('#criteres-gestion-versements #statut-id option:selected').val();
+        const dateAnneFinnSubv = $('#criteres-gestion-versements #annee-financiere-id option:selected').val();
+
+        if (checkCreationVersementsRequiredInputsFilters(dateAnneFinnSubv, versementStatut)) {
+            $('.utd-avis-gestion-versement-filtre').attr('style', 'display:block;');
+
+            return;
+        }
+
+        const obj = {
+
+            VersementStatut: versementStatut,
+            DateAnneFinnSubv: dateAnneFinnSubv
+        }
+
+        $.ajax({
+            url: virtualDirectory + '/gestionVersement/RechercheVersementAGerer',
+            type: 'POST',
+            data: obj,
+            beforeSend: function () {
+                utd.traitementEnCours.debuter(button);
+            },
+            complete: function () {
+                utd.traitementEnCours.terminer(button);
+            },
+            success: function (response) {
+                $("#versements-a-gerer").html(response);
+                $("#versements-a-gerer").removeClass('visually-hidden');
+
+                generertableauversements("Aucune versement à afficher.", 'dtVersementsAGerer');
+
+                manageButtonsState();
+
+            },
+            error: function () {
+                location.href = virtualDirectory + "/Erreur/AfficherErreurTechnique";
+            }
+        });
+    });
+
+
+    //Local Functions
+    function InitDefaultValues() {
+
+        generatMoisDropdownlist('#de-mois-dropdownlist', true);
+        generatMoisDropdownlist('#a-mois-dropdownlist', true);
+
+        $('#criteres-gestion-versements #annee-financiere-id').val(defineAnneFinanciere());
+        $('#criteres-gestion-versements #statut-id').val('AU');
+
+        $("#btnConfirmerValidation").addClass('visually-hidden');
+        $("#btnProduireFichiersVersements").addClass('visually-hidden');
+        $("#btnProduireFichiersPublications").addClass('visually-hidden');
+
+        $('.utd-avis-gestion-versement-filtre').html('');
+        $('.utd-avis-gestion-versement-filtre').attr('style', 'display:none;');
+
+    }
+
+
+    function manageButtonsState() {
+
+        $("#btnConfirmerValidation").addClass('visually-hidden');
+        $("#btnProduireFichiersVersements").addClass('visually-hidden');
+        $("#btnProduireFichiersPublications").addClass('visually-hidden');
+
+        if ($('#dtVersementsAGerer').DataTable().data().length > 0) {
+
+            if ($('#criteres-gestion-versements #statut-id').val() == 'AU') {
+
+                $("#btnConfirmerValidation").removeClass('visually-hidden');
+            }
+            else if ($('#criteres-gestion-versements #statut-id').val() == 'VA') {
+
+                $("#btnProduireFichiersVersements").removeClass('visually-hidden');
+            }
+            else {
+
+                $("#btnConfirmerValidation").addClass('visually-hidden');
+                $("#btnProduireFichiersVersements").addClass('visually-hidden');
+                $("#btnProduireFichiersPublications").addClass('visually-hidden');
+            }
+        }
+    }
+    function checkCreationVersementsRequiredInputsFilters(anneFinanciere, statut) {
+
+        let isOnerror = false;
+        let lis = [];
+
+        if (anneFinanciere === "") {
+
+            isOnerror = true;
+
+            $('#criteres-gestion-versements #champUtdAnneeFinanciere').attr('invalide', true);
+            lis.push(`<li><a href="#champUtdAnneeFinanciere">${$("#champUtdAnneeFinanciere").attr("message-erreur")}</a></li>`);
+        }
+
+        if (statut === "") {
+
+            isOnerror = true;
+
+            $('#criteres-gestion-versements #champUtdStatut').attr('invalide', true);
+            lis.push(`<li><a href="#champUtdStatut">${$("#champUtdStatut").attr("message-erreur")}</a></li>`);
+        }
+
+        $('.utd-avis-gestion-versement-filtre').html(`<ul>${Array.from(lis).join(' ')}</ul>`);
+
+        return isOnerror;
+    }
+
+});
+

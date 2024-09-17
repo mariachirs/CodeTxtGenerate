@@ -1,5 +1,6 @@
 / Function to render the combobox and start with the current month
-  function renderMonthCombobox(selector) {
+  // Function to render the combobox with an option to start with the current month or January
+  function renderMonthCombobox(selector, startFromCurrentMonth = false) {
     // Array of month names in French
     const months = [
       "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -12,16 +13,21 @@
     // Clear the existing options, in case the combobox already has some
     $(selector).empty();
 
-    // Add an initial default option if needed
+    // Add an initial default option
     $(selector).append('<option value="">Sélectionner un mois</option>');
 
-    // Loop through the months starting from the current month
-    for (let i = 0; i < months.length; i++) {
-      // Calculate the index in a circular fashion using modulus operator
-      const monthIndex = (currentMonth - 1 + i) % 12; // This will wrap around after December
-
-      // Value is monthIndex + 1 since months are 1-based
-      $(selector).append(`<option value="${monthIndex + 1}">${months[monthIndex]}</option>`);
+    // If startFromCurrentMonth is true, loop starting from the current month
+    if (startFromCurrentMonth) {
+      for (let i = 0; i < months.length; i++) {
+        // Calculate the index in a circular fashion using modulus operator
+        const monthIndex = (currentMonth - 1 + i) % 12;
+        $(selector).append(`<option value="${monthIndex + 1}">${months[monthIndex]}</option>`);
+      }
+    } else {
+      // Otherwise, start from January and loop normally
+      for (let i = 0; i < months.length; i++) {
+        $(selector).append(`<option value="${i + 1}">${months[i]}</option>`);
+      }
     }
   }
 

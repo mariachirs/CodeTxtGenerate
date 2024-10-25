@@ -1,22 +1,24 @@
- var oldestYear = null;
-    var oldestOption = null;
 
-    // Loop through all the options in the dropdown
-    $('#dateDropdown option').each(function() {
-        // Get the value like '2001-2002'
-        var value = $(this).val();
-        
-        // Extract the beginning year (first part of the string)
-        var yearBegin = parseInt(value.split('-')[0]);
+            //Last Version
+            var oldestYear = null;
+            var oldestOption = null;
 
-        // Compare to find the oldest beginning year
-        if (oldestYear === null || yearBegin < oldestYear) {
-            oldestYear = yearBegin;
-            oldestOption = $(this);
-        }
-    });
+            // Loop through all the options in the dropdown
+            $('#yearDropdown option').each(function() {
+                // Get the value like '2001-2002'
+                var value = $(this).val();
+                
+                // Extract the beginning year (first part of the string)
+                var yearBegin = parseInt(value.split('-')[0]);
 
-    // Set the option with the oldest beginning year as selected
-    if (oldestOption !== null) {
-        oldestOption.prop('selected', true);
-    }
+                // Compare to find the oldest year
+                if (oldestYear === null || yearBegin < oldestYear) {
+                    oldestYear = yearBegin;
+                    oldestOption = $(this);
+                }
+            });
+
+            // Set the option with the oldest year as selected
+            if (oldestOption !== null) {
+                oldestOption.prop('selected', true);
+            }

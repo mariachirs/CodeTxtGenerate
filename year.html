@@ -1,5 +1,4 @@
-$(document).ready(function() {
-    var oldestYear = null;
+ var oldestYear = null;
     var oldestOption = null;
 
     // Loop through all the options in the dropdown
@@ -7,25 +6,17 @@ $(document).ready(function() {
         // Get the value like '2001-2002'
         var value = $(this).val();
         
-        // Split the range and get both years
-        var years = value.split('-');
-        
-        // Convert them to integers
-        var yearBegin = parseInt(years[0]);
-        var yearEnd = parseInt(years[1]);
+        // Extract the beginning year (first part of the string)
+        var yearBegin = parseInt(value.split('-')[0]);
 
-        // Find the oldest year in the range
-        var minYear = Math.min(yearBegin, yearEnd);
-
-        // Compare to find the oldest year
-        if (oldestYear === null || minYear < oldestYear) {
-            oldestYear = minYear;
+        // Compare to find the oldest beginning year
+        if (oldestYear === null || yearBegin < oldestYear) {
+            oldestYear = yearBegin;
             oldestOption = $(this);
         }
     });
 
-    // Set the option with the oldest year as selected
+    // Set the option with the oldest beginning year as selected
     if (oldestOption !== null) {
         oldestOption.prop('selected', true);
     }
-});

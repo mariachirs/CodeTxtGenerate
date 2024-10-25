@@ -10,10 +10,12 @@ $(document).ready(function() {
         // Split the range and get both years
         var years = value.split('-');
         
-        // Convert them to integers and find the smallest year in the range
-        var startYear = parseInt(years[0]);
-        var endYear = parseInt(years[1]);
-        var minYear = Math.min(startYear, endYear);
+        // Convert them to integers
+        var yearBegin = parseInt(years[0]);
+        var yearEnd = parseInt(years[1]);
+
+        // Find the oldest year in the range
+        var minYear = Math.min(yearBegin, yearEnd);
 
         // Compare to find the oldest year
         if (oldestYear === null || minYear < oldestYear) {
